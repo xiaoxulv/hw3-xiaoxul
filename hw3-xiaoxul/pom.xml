@@ -110,4 +110,8 @@
 			</plugin>
 		</plugins>
 	</build>
+	<scm>
+		<connection>scm:git:git@github.com:xiaoxulv/hw3-xiaoxul</connection>
+		<developerConnection>scm:git:git@github.com:xiaoxulv/hw3-xiaoxul</developerConnection>
+	</scm>
 </project>

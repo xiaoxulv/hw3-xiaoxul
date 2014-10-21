@@ -29,6 +29,7 @@ extends JCasAnnotator_ImplBase  {
 			return;
 		}
 		int rel = Integer.parseInt(docInfo.get(0));
+		//System.out.println(docInfo.get(0));
 		int qid = Integer.parseInt(docInfo.get(1));
 		String txt = docInfo.get(2);
 		
