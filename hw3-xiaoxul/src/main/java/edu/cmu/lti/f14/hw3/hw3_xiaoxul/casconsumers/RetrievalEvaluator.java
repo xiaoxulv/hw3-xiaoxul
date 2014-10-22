@@ -142,8 +142,10 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 			
 			//for rel=1
 			Map<String, Integer> doc1 = QIDdocu1.get(qid);
-			QIDscore1.put(qid, computeCosineSimilarity(query, doc1)) ;	
-			
+			QIDscore1.put(qid, computeCosineSimilarity(query, doc1));	
+			//QIDscore1.put(qid, jaccardSimilarity(query, doc1));	
+			//QIDscore1.put(qid, diceSimilarity(query, doc1));
+			//QIDscore1.put(qid, tfidfSimilarity(query, doc1));
 			
 			//for rel=0
 			ArrayList<Map<String, Integer>> doc0list = QIDdocu0.get(qid);
@@ -154,6 +156,9 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 					QIDscore0.put(qid, new ArrayList<Double>());
 				}
 				QIDscore0.get(qid).add(computeCosineSimilarity(query, doc0));
+				//QIDscore0.get(qid).add(jaccardSimilarity(query, doc0));
+				//QIDscore0.get(qid).add(diceSimilarity(query,doc0));
+				//QIDscore0.get(qid).add(tfidfSimilarity(query, doc0));
 			}	
 		}	
 		
@@ -190,8 +195,12 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 		write();
 	}
 	
+	/**
+	 * Write the output in standard format into file.
+	 * @throws IOException
+	 */
 	public void write() throws IOException{
-		File out = new File("report.txt");
+		File out = new File("report0.txt");
 		BufferedWriter buf = null;
 		try {
 			buf = new BufferedWriter(new FileWriter(out));
@@ -208,7 +217,12 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 		buf.flush();
 	}
 	/**
-	 * 
+	 * Compute cosine similarity of two vectors.
+	 * First compute then length(magnitude) of the two vectors, which presented in maps.
+	 * Then compute the dot product of the two vectors.
+	 * Finally compute the cosine similarity.
+	 * @param queryVector
+	 * @param docVector
 	 * @return cosine_similarity
 	 */
 	private double computeCosineSimilarity(Map<String, Integer> queryVector,
@@ -218,27 +232,8 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 		
 		// TODO :: compute cosine similarity between two sentences
 		
-		double qlen = 0.0;
-		
-		Set<String> sq  = queryVector.keySet();
-		//System.out.println(sq);
-		Iterator<String> itq = sq.iterator();
-		while(itq.hasNext()){
-			String q = itq.next();
-			qlen += queryVector.get(q) * queryVector.get(q);
-		}
-		qlen = Math.sqrt(qlen);
-		//System.out.println(qlen);
-		double dlen = 0.0;	
-		Set<String> sd = docVector.keySet();
-		Iterator<String> itd = sd.iterator();
-		while (itd.hasNext()){
-			String d = itd.next();
-			dlen += docVector.get(d) * docVector.get(d);
-		}
-		dlen = Math.sqrt(dlen);
-		//System.out.println(dlen);
-		
+		double qlen = getlen(queryVector);
+		double dlen = getlen(docVector);
 		double mul = 0.0;
 		Set<String> s = queryVector.keySet();
 		Iterator it = s.iterator();
@@ -249,13 +244,106 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 				//System.out.println(mul);
 			}
 		}
-		
 		cosine_similarity = mul / qlen / dlen;
 		return cosine_similarity;
 	}
+	/**
+	 * Compute the magnitude of the vector.
+	 * @param map
+	 * @return len
+	 */
+	private double getlen(Map<String, Integer> map){
+		double len = 0.0;
+		Set<String> s = map.keySet();
+		Iterator<String> it= s.iterator();
+		while(it.hasNext()){
+			String t = it.next();
+			len += map.get(t) * map.get(t);
+		}
+		len = Math.sqrt(len);
+		return len;
+	}
+	
+	/**
+	 * Compute jaccard similarity of two vectors
+	 * Compute the intersection and union set of two vectors to get jaccard Similarity.
+	 * @param queryVector
+	 * @param docVector
+	 * @return jaccardSimilarity 
+	 */
+	private double jaccardSimilarity(Map<String, Integer> queryVector,
+			Map<String, Integer> docVector){
+		double jaccardSimilarity = 0.0;
+		Set<String> union = new HashSet<String>();
+		Set<String> sq = queryVector.keySet();
+		Iterator<String> it = sq.iterator();
+		int a = 0, b = 0;
+		while(it.hasNext()){
+			String t = it.next();
+			if(docVector.containsKey(t)){
+				if(docVector.get(t) == queryVector.get(t))
+					a++;
+			}
+			else
+				b++;
+		}
+		jaccardSimilarity = (double) a / (double) (a+b);
+		return jaccardSimilarity;
+	}
+	/**
+	 * Compute dice similarity of two vectors
+	 * @param queryVector
+	 * @param docVector
+	 * @return
+	 */
+	private double diceSimilarity(Map<String, Integer> queryVector, 
+			Map<String, Integer> docVector){
+		double diceSimilarity = 0.0;
+		Set<String> union = new HashSet<String>();
+		Set<String> sq = queryVector.keySet();
+		Iterator<String> it = sq.iterator();
+		int a = 0, b = 0;
+		while(it.hasNext()){
+			String t = it.next();
+			if(docVector.containsKey(t)){
+				if(docVector.get(t) == queryVector.get(t))
+					a++;
+			}
+			else
+				b++;
+		}
+		diceSimilarity= (double)(2*a) / (double) (a+b);
+		return diceSimilarity;                                                                                                                 
+	}
+	/**
+	 * Compute tfidf similarity of two vectors
+	 * tf(t,q): raw frequency used 
+	 * @param queryVector
+	 * @param docVector
+	 * @return
+	 */
+	private double tfidfSimilarity(Map<String, Integer> queryVector,
+			Map<String, Integer> docVector){
+		double tfidf = 0.0;
+		double tf = 0.0;
+		double idf = 0.0;
+		int corpus = docVector.size();
+		Set<String> sd = docVector.keySet();
+		Iterator<String> iter = sd.iterator();
+		while(iter.hasNext()){
+			String temp = iter.next();
+			if(queryVector.containsKey(temp)){
+				idf += 1;
+				tf += docVector.get(temp);
+			}
+		}
+		idf = Math.log(corpus/(1 + idf));  
+		tfidf = tf * idf; 
+		return tfidf;
+	}
 
 	/**
-	 * 
+	 * Compute the mean reciprocal rank of the text collection. 
 	 * @return mrr
 	 */
 	private double compute_mrr() {

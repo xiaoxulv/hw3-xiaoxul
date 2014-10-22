@@ -13,6 +13,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 import edu.cmu.lti.f14.hw3.hw3_xiaoxul.typesystems.Document;
 import edu.cmu.lti.f14.hw3.hw3_xiaoxul.typesystems.Token;
+import edu.cmu.lti.f14.hw3.hw3_xiaoxul.utils.StanfordLemmatizer;
 import edu.cmu.lti.f14.hw3.hw3_xiaoxul.utils.Utils;
 
 public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
@@ -45,7 +46,7 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 	}
 
 	/**
-	 * 
+	 * Generate the term frequency for the doc
 	 * @param jcas
 	 * @param doc
 	 */
@@ -57,9 +58,14 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 		//TO DO: use tokenize0 from above
 		
 		String text = doc.getText();//.toLowerCase();
+		//use the naive tokenize0
 		List<String> l = tokenize0(text);
 		Iterator<String> it = l.iterator();
-
+		
+		//use Stanford Lemmatizer
+		//String s = StanfordLemmatizer.stemText(text);
+		List<String> L = new LinkedList<String>();
+		
 		//key = word, value = count 
 		HashMap<String, Integer> wordMap = new HashMap<String, Integer>();
 		while(it.hasNext()){
