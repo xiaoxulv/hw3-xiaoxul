@@ -299,20 +299,19 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 	private double diceSimilarity(Map<String, Integer> queryVector, 
 			Map<String, Integer> docVector){
 		double diceSimilarity = 0.0;
-		Set<String> union = new HashSet<String>();
+		int nq = queryVector.size();
+		int nd = docVector.size();
 		Set<String> sq = queryVector.keySet();
 		Iterator<String> it = sq.iterator();
-		int a = 0, b = 0;
+		int count = 0;
 		while(it.hasNext()){
 			String t = it.next();
 			if(docVector.containsKey(t)){
 				if(docVector.get(t) == queryVector.get(t))
-					a++;
+					count++;
 			}
-			else
-				b++;
 		}
-		diceSimilarity= (double)(2*a) / (double) (a+b);
+		diceSimilarity= (double)(count) / (double) (nq + nd);
 		return diceSimilarity;                                                                                                                 
 	}
 	/**
