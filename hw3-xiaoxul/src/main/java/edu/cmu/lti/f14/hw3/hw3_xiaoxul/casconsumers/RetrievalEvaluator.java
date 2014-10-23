@@ -169,7 +169,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 					if(d1 < d2)
 						return 1;
 					else
-						return 0;
+						return -1;
 				}
 			});
 			
@@ -200,7 +200,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 	 * @throws IOException
 	 */
 	public void write() throws IOException{
-		File out = new File("report0.txt");
+		File out = new File("report_test.txt");
 		BufferedWriter buf = null;
 		try {
 			buf = new BufferedWriter(new FileWriter(out));

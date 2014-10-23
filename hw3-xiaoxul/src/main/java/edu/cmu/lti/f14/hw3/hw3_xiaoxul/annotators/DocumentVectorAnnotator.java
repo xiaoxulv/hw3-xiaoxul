@@ -46,7 +46,7 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 	}
 
 	/**
-	 * Generate the term frequency for the doc
+	 * Generate the term frequency for the doc.
 	 * @param jcas
 	 * @param doc
 	 */
