@@ -74,7 +74,7 @@ public class RetrievalEvaluator extends CasConsumer_ImplBase {
 
 	/**
 	 * TODO :: 1. construct the global word dictionary 
-	 * 2. keep the word frequency for each sentence
+	 * 2. keep the word fresquency for each sentence
 	 */
 	@Override
 	public void processCas(CAS aCas) throws ResourceProcessException {
