@@ -1,6 +1,11 @@
 package edu.cmu.lti.f14.hw3.hw3_xiaoxul.annotators;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -62,10 +67,23 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 		List<String> l = tokenize0(text);
 		Iterator<String> it = l.iterator();
 		
-		//use Stanford Lemmatizer
-		//String s = StanfordLemmatizer.stemText(text);
-		List<String> L = new LinkedList<String>();
-		
+
+		List<String> stopWordList = new LinkedList<String>();
+		BufferedReader bf = null;
+		try {
+			bf = new BufferedReader(new FileReader("src/main/resources/stopwords.txt"));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			while(bf.readLine() != null){
+				stopWordList.add(bf.readLine());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//key = word, value = count 
 		HashMap<String, Integer> wordMap = new HashMap<String, Integer>();
 		while(it.hasNext()){
@@ -73,6 +91,11 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 			int len = word.length();
 			String trueWord = word;
 			
+			/*
+			if(Pattern.matches("\\p{Punct}+", trueWord)||stopWordList.contains(trueWord)){
+				continue;
+			}
+			*/
 			/*not needed not task1
 			//get rid of punctuation
 			//nonononono number results in bug
@@ -83,12 +106,14 @@ public class DocumentVectorAnnotator extends JCasAnnotator_ImplBase {
 			*/
 			//System.out.println(trueWord);
 			//store to map
+
 			if(!wordMap.containsKey(trueWord)){
 				wordMap.put(trueWord, 1);
 			}
 			else{
 				wordMap.put(trueWord, 1 + wordMap.get(trueWord));
 			}
+			
 		}
 
 		Set Tokens = new HashSet();
